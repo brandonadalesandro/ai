@@ -233,8 +233,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 maxAct = curAct
             if curVal > beta:
                 return curVal
-            beta = max(beta, curVal)
-        print numAgents
+            alpha = max(alpha, curVal)
         return maxAct
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
