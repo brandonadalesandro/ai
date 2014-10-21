@@ -143,7 +143,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             v = -(float("inf"))
             for action in pacLegalActions:
                 nextState = state.generateSuccessor(0, action)
-                cV = getMinValue(nextState, depth - 1, 1)
+                cV = getMinValue(nextState, depth, 1)
                 v = max(v, cV)
             return v 
         def getMinValue(state, depth, index):
@@ -191,7 +191,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             v = -(float("inf"))
             for action in pacLegalActions:
                 nextState = state.generateSuccessor(0, action)
-                cV = getMinValue(nextState, depth - 1, 1, alpha, beta)
+                cV = getMinValue(nextState, depth, 1, alpha, beta)
                 v = max(v, cV)
                 if v > beta:
                     return v
