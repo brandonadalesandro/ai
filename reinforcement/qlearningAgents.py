@@ -55,6 +55,9 @@ class QLearningAgent(ReinforcementAgent):
         return self.values[(state, action)]
 
     def isTerminal(self, state):
+        """
+            Function that determines if the state is terminal
+        """
         return len(self.getLegalActions(state)) == 0
 
     def computeValueFromQValues(self, state):
@@ -65,6 +68,7 @@ class QLearningAgent(ReinforcementAgent):
           terminal state, you should return a value of 0.0.
         """
         "*** YOUR CODE HERE ***"
+        # COmpute the max value from all the possible actions
         if self.isTerminal(state):
             return 0.0
         max_val = None
@@ -81,12 +85,13 @@ class QLearningAgent(ReinforcementAgent):
           you should return None.
         """
         "*** YOUR CODE HERE ***"
+        # Compute the max action from all the possible actions
         if self.isTerminal(state):
             return None
         max_val = None
         max_act = None
         for action in self.getLegalActions(state):
-            val = self.values[(state, action)]
+            val = self.getQValue(state, action) 
             if max_val is None or val > max_val:
                 max_val = val
                 max_act = action 
@@ -109,6 +114,7 @@ class QLearningAgent(ReinforcementAgent):
         "*** YOUR CODE HERE ***"
         if self.isTerminal(state):
             return None
+        # determine whether to explore or exploit based on epsilon
         if util.flipCoin(self.epsilon):
             return random.choice(legalActions)
         return self.computeActionFromQValues(state)
@@ -187,6 +193,8 @@ class ApproximateQAgent(PacmanQAgent):
           where * is the dotProduct operator
         """
         "*** YOUR CODE HERE ***"
+        # sum up the q values for the weights + features
+        # taken from the assignment page
         q_val = 0.0
         features = self.featExtractor.getFeatures(state, action)
         for feature in features:
@@ -198,6 +206,7 @@ class ApproximateQAgent(PacmanQAgent):
            Should update your weights based on transition
         """
         "*** YOUR CODE HERE ***"
+        # dif, weights update taken from assignment 
         features = self.featExtractor.getFeatures(state, action)
         dif = (reward + self.discount * self.getValue(nextState)) - self.getQValue(state, action)  
         for feature in features:

@@ -47,11 +47,18 @@ class ValueIterationAgent(ValueEstimationAgent):
         # each iteration, make a copy
         # find the max of each state, action pair for each state
         # store it in self.values
+        # adapted from pseudocode from the sides, and info found on wikipedia (http://en.wikipedia.org/wiki/Markov_decision_process)
+        #
         for i in range(iterations):
+            # initially I was just storing the values,
+            # but I realized that I was sometimes updating 
+            # from within the same state, a very long standing bug in my code
             values = self.values.copy()
             for state in mdp.getStates():
+                # decided to skip over terminal states, weird interactions with the autograder
                 if self.mdp.isTerminal(state):
                     continue
+                # Use a list and take the max to avoid the if None or val > max_val loop
                 q_values = []
                 for action in mdp.getPossibleActions(state):
                     val = self.computeQValueFromValues(state, action)
