@@ -260,6 +260,15 @@ class ParticleFilter(InferenceModule):
         weight with each position) is incorrect and may produce errors.
         """
         "*** YOUR CODE HERE ***"
+        self.particles = []
+        particleCounter = 0
+        positionCounter = 0
+        while particleCounter < self.numParticles:
+            if positionCounter >= len(self.legalPositions):
+                positionCounter = 0
+            self.particles.append(self.legalPositions[positionCounter])
+            positionCounter += 1
+            particleCounter += 1
 
     def observe(self, observation, gameState):
         """
@@ -292,7 +301,24 @@ class ParticleFilter(InferenceModule):
         emissionModel = busters.getObservationDistribution(noisyDistance)
         pacmanPosition = gameState.getPacmanPosition()
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+        allPossible = util.Counter()
+        beliefs = self.getBeliefDistribution()
+        if noisyDistance is None:
+            self.particles = [self.getJailPosition()] * self.numParticles
+            return 
+        for p in self.legalPositions:
+            trueDistance = util.manhattanDistance(p, pacmanPosition)
+            allPossible[p] = emissionModel[trueDistance] * beliefs[p]
+        new_particles = []
+
+        if allPossible.totalCount() == 0:
+            self.initializeUniformly(gameState)
+            return
+        for i in range(0, self.numParticles):
+            new_particles.append(util.sample(allPossible))
+
+        self.particles = new_particles
 
     def elapseTime(self, gameState):
         """
@@ -319,8 +345,12 @@ class ParticleFilter(InferenceModule):
         Counter object)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-
+        dist = util.Counter()
+        for p in self.particles:
+            dist[p] += 1.0
+        dist.normalize()
+        return dist
+        
 class MarginalInference(InferenceModule):
     """
     A wrapper around the JointInference module that returns marginal beliefs
