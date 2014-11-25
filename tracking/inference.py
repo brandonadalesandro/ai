@@ -156,7 +156,7 @@ class ExactInference(InferenceModule):
         
         if noisyDistance is None:
             allPossible[self.getJailPosition()] = 1.0
-        
+       
         for p in self.legalPositions:
             trueDistance = util.manhattanDistance(p, pacmanPosition)
             allPossible[p] = emissionModel[trueDistance] * self.beliefs[p]
@@ -335,11 +335,9 @@ class ParticleFilter(InferenceModule):
         a belief distribution.
         """
         "*** YOUR CODE HERE ***"
-        tmp = []
-        for pos in self.particles:
-            newPosDist = self.getPositionDistribution(self.setGhostPosition(gameState, pos))
-            tmp.append(util.sample(newPosDist))
-        self.particles = tmp;
+        for i in range(self.numParticles):
+            newPosDist = self.getPositionDistribution(self.setGhostPosition(gameState, self.particles[i]))
+            self.particles[i] = util.sample(newPosDist)
     
     def getBeliefDistribution(self):
         """
@@ -426,27 +424,17 @@ class JointParticleFilter:
         weight with each position) is incorrect and may produce errors.
         """
         "*** YOUR CODE HERE ***"
-        possPositions = list(itertools.product(self.legalPositions, repeat=self.numGhosts))
-        random.shuffle(possPositions)
+        positions = list(itertools.product(self.legalPositions, repeat=self.numGhosts))
+        random.shuffle(positions)
+        counter = 0
         self.particles = []
-        particleCounter = 0
-        positionCounter = 0
-        """
-         while particleCounter < self.numParticles:
-            if positionCounter >= len(self.legalPositions):
-                positionCounter = 0
-            self.particles.append(self.legalPositions[positionCounter])
-            positionCounter += 1
-            particleCounter += 1
-       """
-        count, self.particles = 0, []
-        while count < self.numParticles:
-            for position in possPositions:
-                if count < self.numParticles:
-                    self.particles.append(position)
-                    count += 1
+        while counter < self.numParticles:
+            for position in positions:
+                if counter >= self.numParticles:
+                    break
                 else:
-                    break 
+                    self.particles.append(position)
+                    counter += 1
 
 
     def addGhostAgent(self, agent):
@@ -501,10 +489,10 @@ class JointParticleFilter:
             for i in range(self.numGhosts):
                 if noisyDistances[i] is None:
                     particle = self.getParticleWithGhostInJail(particle, i)
-                else:
-                    dist = util.manhattanDistance(particle[i], pacmanPosition)
-                    #print "tmp=",tmp," emmisionmodels=",emissionModels[i][dist]
-                    tmp *= emissionModels[i][dist]
+                    continue    
+                dist = util.manhattanDistance(particle[i], pacmanPosition)
+                #print "tmp=",tmp," emmisionmodels=",emissionModels[i][dist]
+                tmp *= emissionModels[i][dist]
             allPossible[particle] += tmp
             
 
